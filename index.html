@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X GROUP | Advanced Cyber Operations</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                    <img src="assets/images/x-group-logo.jpeg" alt="X GROUP" class="brand-logo">
+                    <span class="brand-name" style="color: var(--text-primary);">X GROUP</span>
+                </a>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="nav-elements" id="nav-elements">
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="progress.html" class="nav-link">Progress</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="profile.html" class="btn btn-outline nav-link" id="nav-login-btn">Portal Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">CYBER EXPERTS</div>
+            <h1 class="hero-title">Master the Art of <br><span class="highlight">Cyber Warfare</span></h1>
+            <p class="hero-subtitle">Equipping the next generation of security professionals with elite offensive and defensive capabilities. Real-world scenarios, enterprise-grade training.</p>
+            
+            <div class="hero-buttons">
+                <a href="about.html" class="btn btn-primary">Explore Curriculum</a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="mock-window">
+                <div class="window-header">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div class="window-body">
+                    <p class="code-line"><span class="prompt">admin@xgroup:~$</span> ./initialize_training_module</p>
+                    <p class="code-line sys-out">Loading core syllabus... [SUCCESS]</p>
+                    <p class="code-line sys-out">Establishing secure connection... [SUCCESS]</p>
+                    <p class="code-line sys-out">Awaiting student authentication...</p>
+                    <p class="code-line sys-out"><a style="color: aliceblue;" href="profile.html">Login</a></p>
+                    <p class="code-line blink">_</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="pillars">
+        <div class="container pillars-grid">
+            <div class="pillar-card">
+                <div class="icon-wrapper">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>Offensive Security</h3>
+                <p>Advanced penetration testing methodologies, exploit development, and adversary simulation.</p>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="icon-wrapper">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h3>Defensive Architecture</h3>
+                <p>Network hardening, threat hunting, zero-trust infrastructure, and rapid incident response.</p>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="icon-wrapper">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                </div>
+                <h3>Applied Cryptography</h3>
+                <p>Enterprise encryption standards, secure key exchange, and cryptographic vulnerability analysis.</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/ui.js"></script>
+</body>
+</html>

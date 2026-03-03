@@ -1,0 +1,70 @@
+/* css/glitch.css */
+
+.glitch-title {
+    position: relative;
+    font-size: 4.5rem;
+    font-weight: bold;
+    color: var(--text-main);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    /* Keeps the text on top of the background */
+    z-index: 1; 
+    margin-bottom: 10px;
+}
+
+/* We use the data-text attribute from your HTML to create two invisible copies of the text */
+.glitch-title::before,
+.glitch-title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-black);
+}
+
+/* The first copy: shifted slightly left, glowing red, animated randomly */
+.glitch-title::before {
+    left: 3px;
+    text-shadow: -2px 0 var(--neon-red);
+    clip-path: inset(24px 0 12px 0);
+    animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+}
+
+/* The second copy: shifted slightly right, flashing white, animated differently */
+.glitch-title::after {
+    left: -3px;
+    text-shadow: -2px 0 #ffffff;
+    clip-path: inset(10px 0 40px 0);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+/* --- The slicing animations --- */
+/* clip-path: inset(top right bottom left) cuts the text into thin horizontal bands */
+
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(12px 0 81px 0); transform: translate(-2px, 1px); }
+    20% { clip-path: inset(89px 0 10px 0); transform: translate(2px, -1px); }
+    40% { clip-path: inset(45px 0 30px 0); transform: translate(-2px, 2px); }
+    60% { clip-path: inset(11px 0 55px 0); transform: translate(2px, -2px); }
+    80% { clip-path: inset(76px 0 20px 0); transform: translate(-1px, 1px); }
+    100% { clip-path: inset(22px 0 65px 0); transform: translate(1px, -1px); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(25px 0 45px 0); transform: translate(2px, -1px); }
+    20% { clip-path: inset(65px 0 12px 0); transform: translate(-2px, 1px); }
+    40% { clip-path: inset(15px 0 78px 0); transform: translate(2px, 2px); }
+    60% { clip-path: inset(85px 0 5px 0); transform: translate(-2px, -2px); }
+    80% { clip-path: inset(35px 0 55px 0); transform: translate(1px, 1px); }
+    100% { clip-path: inset(5px 0 85px 0); transform: translate(-1px, -1px); }
+}
+
+/* Mobile scaling for the glitch text */
+@media screen and (max-width: 768px) {
+    .glitch-title {
+        font-size: 3rem;
+    }
+}
