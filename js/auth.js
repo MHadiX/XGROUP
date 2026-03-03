@@ -7,86 +7,96 @@ document.addEventListener("DOMContentLoaded", () => {
     const imagePreview = document.getElementById('image-preview');
     const placeholder = document.getElementById('upload-placeholder');
     const logoutBtn = document.getElementById('logout-btn');
+    
+    // Mobile Nav Elements
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navElements = document.getElementById('nav-elements');
 
     const sheetId = "199lSNROkokVMpJYxX1kvim--LrqlBZd_rgjhwZQ9trk";
 
-    // --- 1. ENHANCED PHOTO LOGIC (User-Specific) ---
-
-/**
- * Function to apply photo based on the logged-in Student ID
- * @param {string} studentId 
- */
-const applySavedPhoto = (studentId) => {
-    if (!studentId) return;
-
-    // Use a unique key for every user
-    const userKey = `photo_${studentId}`;
-    const savedPhoto = localStorage.getItem(userKey);
-    
-    const imagePreview = document.getElementById('image-preview');
-    const placeholder = document.getElementById('upload-placeholder');
-
-    if (savedPhoto && imagePreview) {
-        imagePreview.style.backgroundImage = `url(${savedPhoto})`;
-        imagePreview.style.backgroundSize = "cover";
-        imagePreview.style.backgroundPosition = "center";
-        imagePreview.style.border = "2px solid var(--brand-red)";
-        if (placeholder) placeholder.style.display = 'none';
-    } else {
-        // Reset to default if no photo exists for THIS specific user
-        if (imagePreview) {
-            imagePreview.style.backgroundImage = 'none';
-            imagePreview.style.border = "2px dashed var(--border-subtle)";
-        }
-        if (placeholder) placeholder.style.display = 'block';
-    }
-};
-
-// Handle New Uploads keyed to the active user
-if (avatarInput) {
-    avatarInput.addEventListener('change', function() {
-        const file = this.files[0];
-        // We get the ID of the person currently logged in from the UI
-        const currentActiveId = document.getElementById('display-id').innerText;
-
-        if (file && currentActiveId && currentActiveId !== "---") {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Image = e.target.result;
-                // Save with the Unique User Key
-                localStorage.setItem(`photo_${currentActiveId}`, base64Image);
-                applySavedPhoto(currentActiveId);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            alert("Please log in before uploading a photo.");
-        }
-    });
-}
-
-    // Load photo immediately on page load
-    applySavedPhoto();
-
-    if (avatarInput) {
-        avatarInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                if (file.size > 2 * 1024 * 1024) { 
-                    alert("FILE SIZE EXCEEDED: Limit 2MB");
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const base64Image = e.target.result;
-                    localStorage.setItem('operative_photo', base64Image);
-                    applySavedPhoto();
-                };
-                reader.readAsDataURL(file);
-            }
+    // --- 1. MOBILE NAV LOGIC ---
+    if (mobileMenuBtn && navElements) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navElements.classList.toggle('show');
         });
     }
 
-    // --- 2. AUTHENTICATION & STATS LOGIC ---
+    // --- 2. PHOTO LOGIC (Persistent & User-Specific) ---
+    const applySavedPhoto = (studentId) => {
+        if (!studentId) return;
+
+        const userKey = `photo_${studentId}`;
+        const savedPhoto = localStorage.getItem(userKey);
+
+        if (savedPhoto && imagePreview) {
+            imagePreview.style.backgroundImage = `url(${savedPhoto})`;
+            imagePreview.style.backgroundSize = "cover";
+            imagePreview.style.backgroundPosition = "center";
+            imagePreview.style.border = "2px solid var(--brand-red)";
+            if (placeholder) placeholder.style.display = 'none';
+        } else if (imagePreview) {
+            imagePreview.style.backgroundImage = 'none';
+            imagePreview.style.border = "2px dashed var(--border-subtle)";
+            if (placeholder) placeholder.style.display = 'block';
+        }
+    };
+
+    // --- 3. SESSION RECOVERY (Solves the Refresh Issue) ---
+    const activeSessionId = localStorage.getItem('active_operative_id');
+    
+    if (activeSessionId) {
+        // If a session exists, skip login and fetch data immediately
+        loginView.style.display = 'none';
+        dashboardView.style.display = 'block';
+        fetchAndPopulateDashboard(activeSessionId);
+    }
+
+    // --- 4. DATA FETCHING FUNCTION ---
+    async function fetchAndPopulateDashboard(studentId) {
+        try {
+            // Fetch Stats from 'Sheet1'
+            const statsUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+            const statsRes = await fetch(statsUrl);
+            const statsText = await statsRes.text();
+            const statsJson = JSON.parse(statsText.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1]);
+            const statsRows = statsJson.table.rows;
+
+            let allStudents = [];
+            statsRows.forEach(row => {
+                if (row.c && row.c[0] && row.c[0].v !== 'Name') {
+                    allStudents.push({
+                        name: String(row.c[0].v).trim(),
+                        thm: row.c[1] ? String(row.c[1].v).trim() : 'N/A',
+                        rooms: row.c[3] ? parseInt(row.c[3].v) || 0 : 0,
+                        points: row.c[4] ? parseInt(row.c[4].v) || 0 : 0
+                    });
+                }
+            });
+
+            // Calculate Ranking
+            allStudents.sort((a, b) => b.points - a.points);
+            const studentIndex = allStudents.findIndex(s => s.name === studentId);
+            const stats = allStudents[studentIndex];
+
+            if (stats) {
+                document.getElementById('display-name').innerText = stats.name;
+                document.getElementById('display-id').innerText = stats.name;
+                document.getElementById('display-thm').innerText = stats.thm;
+                document.getElementById('stat-rooms').innerText = stats.rooms;
+                document.getElementById('stat-points').innerText = stats.points;
+                
+                const rankEl = document.getElementById('stat-rank');
+                if (rankEl) rankEl.innerText = `#${studentIndex + 1}`;
+                
+                // Critical: Apply the photo now that we know the ID
+                applySavedPhoto(studentId);
+            }
+        } catch (e) {
+            console.error("Dashboard Sync Failed:", e);
+        }
+    }
+
+    // --- 5. AUTHENTICATION LOGIC ---
     if (authForm) {
         authForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -98,7 +108,6 @@ if (avatarInput) {
             submitBtn.disabled = true;
 
             try {
-                // Fetch Auth Data from 'login' sheet
                 const authUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=login`;
                 const authRes = await fetch(authUrl);
                 const authText = await authRes.text();
@@ -112,56 +121,46 @@ if (avatarInput) {
                     }
                 }
 
-                if (!validUser) {
+                if (validUser) {
+                    // Save Session so refresh works
+                    localStorage.setItem('active_operative_id', studentId);
+                    loginView.style.display = 'none';
+                    dashboardView.style.display = 'block';
+                    fetchAndPopulateDashboard(studentId);
+                } else {
                     alert("ACCESS DENIED");
                     submitBtn.innerText = "Authenticate";
                     submitBtn.disabled = false;
-                    return;
                 }
-
-                // Fetch Stats from 'Sheet1'
-                const statsUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=Sheet1`;
-                const statsRes = await fetch(statsUrl);
-                const statsText = await statsRes.text();
-                const statsRows = JSON.parse(statsText.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1]).table.rows;
-
-                let stats = { name: studentId, thm: 'Not Linked', rooms: 0, points: 0 };
-                for (let row of statsRows) {
-                    if (row.c && row.c[0] && String(row.c[0].v).trim() === studentId) {
-                        stats.thm = row.c[1] ? row.c[1].v : 'N/A';
-                        stats.rooms = row.c[3] ? row.c[3].v : 0;
-                        stats.points = row.c[4] ? row.c[4].v : 0;
-                        break;
-                    }
-                }
-
-                // Update UI
-                document.getElementById('display-name').innerText = stats.name;
-                document.getElementById('display-id').innerText = stats.name;
-                document.getElementById('display-thm').innerText = stats.thm;
-                document.getElementById('stat-rooms').innerText = stats.rooms;
-                document.getElementById('stat-points').innerText = stats.points;
-
-                // Transition Views
-                loginView.style.display = 'none';
-                dashboardView.style.display = 'block';
-                
-                // Re-apply photo just in case the dashboard rendering needs a nudge
-                applySavedPhoto();
-
             } catch (err) {
-                console.error(err);
                 alert("GATEWAY ERROR");
-                submitBtn.innerText = "Authenticate";
                 submitBtn.disabled = false;
             }
         });
     }
 
-    // --- 3. LOGOUT LOGIC ---
+    // --- 6. UPLOAD LOGIC ---
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function() {
+            const file = this.files[0];
+            const currentActiveId = localStorage.getItem('active_operative_id');
+
+            if (file && currentActiveId) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    localStorage.setItem(`photo_${currentActiveId}`, base64Image);
+                    applySavedPhoto(currentActiveId);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // --- 7. LOGOUT LOGIC ---
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            // Reload resets the state, effectively logging the user out
+            localStorage.removeItem('active_operative_id');
             window.location.reload();
         });
     }

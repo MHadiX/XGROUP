@@ -580,3 +580,79 @@ body {
     opacity: 1;
     border: 2px solid var(--brand-red);
 }
+/* --- Mobile Menu Fix --- */
+@media (max-width: 900px) {
+    /* Ensure the elements are hidden by default on mobile */
+    .nav-elements {
+        display: none; 
+        flex-direction: column;
+        position: absolute;
+        top: 100%; /* Sits right under the navbar */
+        left: 0;
+        width: 100%;
+        background: rgba(7, 9, 15, 0.98); /* Deep background for contrast */
+        backdrop-filter: blur(15px);
+        padding: 30px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        gap: 24px;
+        z-index: 999;
+    }
+
+    /* This is the class the JavaScript toggles */
+    .nav-elements.show {
+        display: flex !important;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+}
+/* --- Mobile Menu Universal Fix --- */
+@media (max-width: 900px) {
+    /* Base state for mobile */
+    #nav-elements {
+        display: none !important; /* Force hide by default */
+        flex-direction: column;
+        position: absolute;
+        top: 70px; /* Adjust based on your navbar height */
+        left: 0;
+        width: 100%;
+        background-color: #07090f !important; /* Match your theme */
+        padding: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        z-index: 9999 !important;
+    }
+
+    /* JavaScript Toggle State */
+    #nav-elements.show {
+        display: flex !important; /* Force show when class is present */
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+}
+/* --- Mobile Menu Visibility --- */
+@media (max-width: 900px) {
+    #nav-elements {
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        position: absolute;
+        top: 60px; /* Adjust to match your navbar height */
+        left: 0;
+        width: 100%;
+        background: #07090f; /* Match your theme */
+        z-index: 10000;
+        padding: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* This class is added by the JS */
+    #nav-elements.show {
+        display: flex !important;
+    }
+}
